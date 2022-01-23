@@ -16,18 +16,39 @@ import {
   FormControlLabel
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-
+import { useAuth } from '../../../hooks/useAuth';
+import { loginApi } from '../../../apis/Login';
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const { toggleAuth } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
   const LoginSchema = Yup.object().shape({
-    email: Yup.string().email('Email must be a valid email address').required('Email is required'),
-    password: Yup.string().required('Password is required')
+    email: Yup.string().email('ایمیل باید تایید شده باشد').required('ایمیل را وارد کنید'),
+    password: Yup.string().required('رمز عبور را وارد کنید')
   });
 
+  const sentDataToserver = async (formData) => {
+    try {
+      const { data } = await loginApi(formData);
+      console.log(data);
+      const {
+        status,
+        message,
+        data: { token }
+      } = data;
+      if (status) {
+        toggleAuth(token);
+        navigate('/dashboard');
+      } else {
+        console.log(message);
+      }
+    } catch (err) {
+      throw new Error('sentDataToserver has error!');
+    }
+  };
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -35,9 +56,7 @@ export default function LoginForm() {
       remember: true
     },
     validationSchema: LoginSchema,
-    onSubmit: () => {
-      navigate('/dashboard', { replace: true });
-    }
+    onSubmit: sentDataToserver
   });
 
   const { errors, touched, values, isSubmitting, handleSubmit, getFieldProps } = formik;
