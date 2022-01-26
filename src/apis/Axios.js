@@ -2,7 +2,7 @@ import axios from 'axios';
 
 function getHeaders() {
   return {
-    Authorization: `Bearer ${JSON.parse(localStorage.getItem('user'))?.token}`
+    Authorization: `Bearer ${JSON.parse(localStorage.getItem('_deliery_manager'))?.token}`
   };
 }
 

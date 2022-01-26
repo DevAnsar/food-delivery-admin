@@ -1,3 +1,4 @@
+import { Toaster } from 'react-hot-toast';
 // routes
 import Router from './routes';
 // theme
@@ -7,7 +8,6 @@ import GlobalStyles from './theme/globalStyles';
 import ScrollToTop from './components/ScrollToTop';
 import { BaseOptionChartStyle } from './components/charts/BaseOptionChart';
 import AuthProvider from './providers/AuthProvider';
-
 // ----------------------------------------------------------------------
 
 export default function App() {
@@ -19,6 +19,7 @@ export default function App() {
         <BaseOptionChartStyle />
         <Router />
       </AuthProvider>
+      <Toaster />
     </ThemeConfig>
   );
 }

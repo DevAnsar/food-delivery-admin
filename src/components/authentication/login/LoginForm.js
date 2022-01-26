@@ -5,9 +5,9 @@ import { useFormik, Form, FormikProvider } from 'formik';
 import { Icon } from '@iconify/react';
 import eyeFill from '@iconify/icons-eva/eye-fill';
 import eyeOffFill from '@iconify/icons-eva/eye-off-fill';
+import toast from 'react-hot-toast';
 // material
 import {
-  Link,
   Stack,
   Checkbox,
   TextField,
@@ -43,6 +43,7 @@ export default function LoginForm() {
         toggleAuth(token);
         navigate('/dashboard');
       } else {
+        toast.error('نام کاربری یا رمز عبور اشتباه است');
         console.log(message);
       }
     } catch (err) {
@@ -73,7 +74,7 @@ export default function LoginForm() {
             fullWidth
             autoComplete="username"
             type="email"
-            label="Email address"
+            label="آدرس ایمیل"
             {...getFieldProps('email')}
             error={Boolean(touched.email && errors.email)}
             helperText={touched.email && errors.email}
@@ -83,7 +84,7 @@ export default function LoginForm() {
             fullWidth
             autoComplete="current-password"
             type={showPassword ? 'text' : 'password'}
-            label="Password"
+            label="رمز ورود"
             {...getFieldProps('password')}
             InputProps={{
               endAdornment: (
@@ -102,12 +103,8 @@ export default function LoginForm() {
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
           <FormControlLabel
             control={<Checkbox {...getFieldProps('remember')} checked={values.remember} />}
-            label="Remember me"
+            label="به خاطر بسپار"
           />
-
-          <Link component={RouterLink} variant="subtitle2" to="#">
-            Forgot password?
-          </Link>
         </Stack>
 
         <LoadingButton
@@ -117,7 +114,7 @@ export default function LoginForm() {
           variant="contained"
           loading={isSubmitting}
         >
-          Login
+          ورود
         </LoadingButton>
       </Form>
     </FormikProvider>
