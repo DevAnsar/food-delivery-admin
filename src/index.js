@@ -1,5 +1,6 @@
 // scroll bar
 import 'simplebar/src/simplebar.css';
+import './fonts/Yekan/Yekan.css';
 
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
