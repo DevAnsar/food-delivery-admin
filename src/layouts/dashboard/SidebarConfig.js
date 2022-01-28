@@ -20,7 +20,7 @@ const sidebarConfig = [
   },
   {
     title: 'فروشندگان',
-    path: '/dashboard/deliveries',
+    path: '/dashboard/delivery',
     icon: getIcon(peopleFill)
   },
   {

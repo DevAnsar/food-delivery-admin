@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Icon } from '@iconify/react';
 // import { sentenceCase } from 'change-case';
 import plusFill from '@iconify/icons-eva/plus-fill';
@@ -16,7 +16,8 @@ import {
   Container,
   Typography,
   TableContainer,
-  TablePagination
+  TablePagination,
+  Avatar
 } from '@mui/material';
 import toast from 'react-hot-toast';
 // components
@@ -24,8 +25,9 @@ import Page from '../components/Page';
 import Scrollbar from '../components/Scrollbar';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../components/_dashboard/user';
-import { getUsersApi } from '../apis/User';
-import { getComparator, applySortFilter } from '../utils/tableFn';
+import { getDeliveriesApi } from '../apis/User';
+
+import { useTableData } from '../hooks/useTableData';
 //
 // import USERLIST from '../_mocks_/user';
 
@@ -33,35 +35,49 @@ import { getComparator, applySortFilter } from '../utils/tableFn';
 
 const TABLE_HEAD = [
   { id: 'name', label: 'نام', alignRight: false },
-  { id: 'mobile', label: 'شماره موبایل', alignRight: false },
-  { id: 'email', label: 'ایمیل', alignRight: false },
+  { id: 'user', label: 'کاربر', alignRight: false },
+  { id: 'description', label: 'توضیحات', alignRight: false },
   { id: '' }
 ];
 
 // ----------------------------------------------------------------------
 
-export default function User() {
-  const [users, setUsers] = useState([]);
-  const [page, setPage] = useState(0);
-  const [order, setOrder] = useState('asc');
-  const [selected, setSelected] = useState([]);
-  const [orderBy, setOrderBy] = useState('id');
-  const [filterName, setFilterName] = useState('');
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+export default function Delivery() {
+  const {
+    data: deliveries,
+    setData: setDeliveries,
+    selected,
+    filterName,
+    handleFilterByName,
+    order,
+    orderBy,
+    handleRequestSort,
+    handleSelectAllClick,
+    filteredData,
+    page,
+    rowsPerPage,
+    handleRowClick,
+    emptyRows,
+    isDataNotFound,
+    handleChangePage,
+    handleChangeRowsPerPage,
+    rowsPerPageOptions
+  } = useTableData();
 
   useEffect(() => {
-    getUsersData();
+    getDeliveriesData();
   }, []);
-  const getUsersData = async () => {
+
+  const getDeliveriesData = async () => {
     try {
-      const { data } = await getUsersApi();
+      const { data } = await getDeliveriesApi();
       const {
         status,
         message,
-        data: { users }
+        data: { deliveries }
       } = data;
       if (status) {
-        setUsers(users);
+        setDeliveries(deliveries);
       } else {
         toast.error(message);
       }
@@ -69,64 +85,12 @@ export default function User() {
       toast.error('مشکل در برقراری ارتباط با سرور');
     }
   };
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = users.map((n) => n.id);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const handleFilterByName = (event) => {
-    setFilterName(event.target.value);
-  };
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
-
-  const filteredUsers = applySortFilter(users, getComparator(order, orderBy), filterName);
-
-  const isUserNotFound = filteredUsers.length === 0;
-
   return (
-    <Page title="User">
+    <Page title="فروشندگان">
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            کاربران
+            فروشندگان
           </Typography>
           <Button
             variant="contained"
@@ -134,7 +98,7 @@ export default function User() {
             to="#"
             startIcon={<Icon icon={plusFill} />}
           >
-            کاربر جدید
+            فروشنده جدید
           </Button>
         </Stack>
 
@@ -152,16 +116,22 @@ export default function User() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={users.length}
+                  rowCount={deliveries.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers
+                  {filteredData
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => {
-                      const { id, name, mobile, email } = row;
+                      const {
+                        id,
+                        name,
+                        user: { name: userName, email: userEmail },
+                        description,
+                        image
+                      } = row;
                       const isItemSelected = selected.indexOf(id) !== -1;
 
                       return (
@@ -176,19 +146,21 @@ export default function User() {
                           <TableCell padding="checkbox">
                             <Checkbox
                               checked={isItemSelected}
-                              onChange={(event) => handleClick(event, id)}
+                              onChange={(event) => handleRowClick(event, id)}
                             />
                           </TableCell>
                           <TableCell component="th" scope="row" padding="none">
                             <Stack direction="row" alignItems="center" spacing={2}>
-                              {/* <Avatar alt={name} src={avatarUrl} /> */}
+                              <Avatar alt={name} src={image} />
                               <Typography variant="subtitle2" noWrap>
                                 {name}
                               </Typography>
                             </Stack>
                           </TableCell>
-                          <TableCell align="left">{mobile}</TableCell>
-                          <TableCell align="left">{email}</TableCell>
+                          <TableCell align="left">
+                            {userName} {userEmail}
+                          </TableCell>
+                          <TableCell align="left">{description}</TableCell>
                           <TableCell align="right">
                             <UserMoreMenu />
                           </TableCell>
@@ -201,7 +173,7 @@ export default function User() {
                     </TableRow>
                   )}
                 </TableBody>
-                {isUserNotFound && (
+                {isDataNotFound && (
                   <TableBody>
                     <TableRow>
                       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
@@ -215,9 +187,9 @@ export default function User() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={rowsPerPageOptions}
             component="div"
-            count={users.length}
+            count={deliveries.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
