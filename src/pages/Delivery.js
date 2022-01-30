@@ -24,8 +24,8 @@ import toast from 'react-hot-toast';
 import Page from '../components/Page';
 import Scrollbar from '../components/Scrollbar';
 import SearchNotFound from '../components/SearchNotFound';
-import { UserListHead, UserListToolbar, UserMoreMenu } from '../components/_dashboard/user';
-import { getDeliveriesApi } from '../apis/User';
+import { ListHead, ListToolbar, MoreMenu } from '../components/_dashboard/table';
+import { getDeliveriesApi } from '../apis/Delivery';
 
 import { useTableData } from '../hooks/useTableData';
 //
@@ -103,7 +103,7 @@ export default function Delivery() {
         </Stack>
 
         <Card>
-          <UserListToolbar
+          <ListToolbar
             numSelected={selected.length}
             filterName={filterName}
             onFilterName={handleFilterByName}
@@ -112,7 +112,7 @@ export default function Delivery() {
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
-                <UserListHead
+                <ListHead
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
@@ -162,7 +162,7 @@ export default function Delivery() {
                           </TableCell>
                           <TableCell align="left">{description}</TableCell>
                           <TableCell align="right">
-                            <UserMoreMenu />
+                            <MoreMenu editLink={`/dashboard/delivery/${id}`} />
                           </TableCell>
                         </TableRow>
                       );
