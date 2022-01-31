@@ -25,9 +25,10 @@ import Page from '../components/Page';
 import Scrollbar from '../components/Scrollbar';
 import SearchNotFound from '../components/SearchNotFound';
 import { ListHead, ListToolbar, MoreMenu } from '../components/_dashboard/table';
-import { getDeliveriesApi } from '../apis/Delivery';
+import { getDeliveriesApi, deleteDeliveryApi } from '../apis/Delivery';
 
 import { useTableData } from '../hooks/useTableData';
+import YesNoModal from '../components/_dashboard/app/YesNoModal';
 //
 // import USERLIST from '../_mocks_/user';
 
@@ -44,8 +45,8 @@ const TABLE_HEAD = [
 
 export default function Delivery() {
   const {
-    data: deliveries,
-    setData: setDeliveries,
+    deta: deliveries,
+    setDeta: setDeliveries,
     selected,
     filterName,
     handleFilterByName,
@@ -61,7 +62,12 @@ export default function Delivery() {
     isDataNotFound,
     handleChangePage,
     handleChangeRowsPerPage,
-    rowsPerPageOptions
+    rowsPerPageOptions,
+    showDelete,
+    handleDeleteModalVisible,
+    deleteItemId,
+    deleteLoading,
+    setDeleteLoading
   } = useTableData();
 
   useEffect(() => {
@@ -85,6 +91,27 @@ export default function Delivery() {
       toast.error('مشکل در برقراری ارتباط با سرور');
     }
   };
+
+  const handleDelete = async () => {
+    try {
+      setDeleteLoading(true);
+      const {
+        data: { status, message }
+      } = await deleteDeliveryApi(deleteItemId);
+      if (status) {
+        toast.success(message);
+        setDeliveries((prevDeliveries) => prevDeliveries.filter((d) => d.id !== deleteItemId));
+      } else {
+        toast.error(message);
+      }
+      handleDeleteModalVisible();
+      setDeleteLoading(false);
+    } catch (err) {
+      handleDeleteModalVisible();
+      setDeleteLoading(false);
+      toast.error('خطای سرور');
+    }
+  };
   return (
     <Page title="فروشندگان">
       <Container>
@@ -95,7 +122,7 @@ export default function Delivery() {
           <Button
             variant="contained"
             component={RouterLink}
-            to="#"
+            to="/dashboard/delivery/create"
             startIcon={<Icon icon={plusFill} />}
           >
             فروشنده جدید
@@ -162,7 +189,10 @@ export default function Delivery() {
                           </TableCell>
                           <TableCell align="left">{description}</TableCell>
                           <TableCell align="right">
-                            <MoreMenu editLink={`/dashboard/delivery/${id}`} />
+                            <MoreMenu
+                              editLink={`/dashboard/delivery/${id}`}
+                              handleDelete={() => handleDeleteModalVisible(true, id)}
+                            />
                           </TableCell>
                         </TableRow>
                       );
@@ -194,6 +224,13 @@ export default function Delivery() {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+          <YesNoModal
+            open={showDelete}
+            onClose={() => handleDeleteModalVisible(false)}
+            handleAction={handleDelete}
+            message="آیا از حذف این فروشگاه مطمعن هستید"
+            actionLoading={deleteLoading}
           />
         </Card>
       </Container>

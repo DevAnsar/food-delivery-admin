@@ -25,6 +25,7 @@ export default function Router() {
         { path: 'user', element: <User /> },
         { path: 'delivery', element: <Delivery /> },
         { path: 'delivery/:id', element: <DeliveryForm mode="edit" /> },
+        { path: 'delivery/create', element: <DeliveryForm mode="create" /> },
         { path: 'products', element: <Products /> },
         { path: 'blog', element: <Blog /> }
       ]

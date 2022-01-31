@@ -5,4 +5,13 @@ const getDeliveryApi = (id) => AuthAxios.get(`/deliveries/${id}`, { headers: get
 const updateDeliveryApi = (id, data) =>
   AuthAxios.put(`/deliveries/${id}`, data, { headers: getHeaders() });
 
-export { getDeliveriesApi, getDeliveryApi, updateDeliveryApi };
+const deleteDeliveryApi = (id) => AuthAxios.delete(`/deliveries/${id}`);
+const createDeliveryApi = (data) => AuthAxios.post(`/deliveries`, data, { headers: getHeaders() });
+
+export {
+  getDeliveriesApi,
+  getDeliveryApi,
+  updateDeliveryApi,
+  deleteDeliveryApi,
+  createDeliveryApi
+};

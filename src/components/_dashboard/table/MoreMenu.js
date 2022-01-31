@@ -10,9 +10,10 @@ import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/mat
 
 // ----------------------------------------------------------------------
 MoreMenu.propTypes = {
-  editLink: PropTypes.string
+  editLink: PropTypes.string.isRequired,
+  handleDelete: PropTypes.func.isRequired
 };
-export default function MoreMenu({ editLink }) {
+export default function MoreMenu({ editLink, handleDelete }) {
   const ref = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -32,7 +33,7 @@ export default function MoreMenu({ editLink }) {
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem sx={{ color: 'text.secondary' }}>
+        <MenuItem onClick={handleDelete} sx={{ color: 'text.secondary' }}>
           <ListItemIcon>
             <Icon icon={trash2Outline} width={24} height={24} />
           </ListItemIcon>
