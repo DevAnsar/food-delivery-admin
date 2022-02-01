@@ -16,7 +16,8 @@ import {
   Select,
   OutlinedInput,
   MenuItem,
-  useTheme
+  useTheme,
+  Chip
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { styled } from '@mui/material/styles';
@@ -24,8 +25,12 @@ import toast from 'react-hot-toast';
 // components
 import Page from '../../Page';
 import Scrollbar from '../../Scrollbar';
-import { getDeliveryApi, updateDeliveryApi, createDeliveryApi } from '../../../apis/Delivery';
-import { getUsersApi } from '../../../apis/User';
+import {
+  getDeliveryApi,
+  updateDeliveryApi,
+  createDeliveryApi,
+  getFormDataApi
+} from '../../../apis/Delivery';
 
 const ContentStyle = styled('div')(({ theme }) => ({
   maxWidth: 480,
@@ -35,6 +40,7 @@ const ContentStyle = styled('div')(({ theme }) => ({
   justifyContent: 'center',
   padding: theme.spacing(10, 0)
 }));
+
 function getStyles(userId, selectedUserId, theme) {
   return {
     fontWeight:
@@ -53,13 +59,16 @@ export default function DeliveryForm({ mode }) {
   const navigate = useNavigate();
   const [delivery, setDelivery] = useState(null);
   const [users, setUsers] = useState([]);
+  const [categories, setCategories] = useState([]);
+
   useEffect(() => {
     if (mode === 'edit') getDeliveryData();
-    getUsersData();
+    getFormData();
   }, []);
 
   const formSchema = Yup.object().shape({
     userId: Yup.number().required('کاربر را انتخاب کنید'),
+    categoryId: Yup.number().required('دسته فروشگاه را انتخاب کنید'),
     name: Yup.string().required('نام فروشگاه را وارد کنید'),
     deliveryTime: Yup.string().required('مدت زمان تحوبل سفارش الزامی است'),
     description: Yup.string()
@@ -67,6 +76,7 @@ export default function DeliveryForm({ mode }) {
   const formik = useFormik({
     initialValues: {
       userId: '',
+      categoryId: '',
       name: '',
       deliveryTime: '',
       description: ''
@@ -88,8 +98,8 @@ export default function DeliveryForm({ mode }) {
 
       if (status) {
         setDelivery(delivery);
-        const { name, description, deliveryTime } = delivery;
-        setValues({ name, description, deliveryTime });
+        const { name, description, deliveryTime, categoryId, userId } = delivery;
+        setValues({ name, description, deliveryTime, categoryId, userId });
       } else {
         toast.error(message);
         navigate('/dashboard/delivery');
@@ -100,18 +110,19 @@ export default function DeliveryForm({ mode }) {
     }
   };
 
-  const getUsersData = async () => {
+  const getFormData = async () => {
     try {
       const {
         data: {
           status,
           message,
-          data: { users }
+          data: { users, categories }
         }
-      } = await getUsersApi();
+      } = await getFormDataApi();
 
       if (status) {
         setUsers(users);
+        setCategories(categories);
       } else {
         toast.error(message);
         navigate('/dashboard/delivery');
@@ -189,7 +200,28 @@ export default function DeliveryForm({ mode }) {
                             value={user.id}
                             style={getStyles(user.id, values.userId, theme)}
                           >
-                            {user.name || 'بدون نام'} | {user.email || 'بدون ایمیل'} | {user.mobile}
+                            {user.name || <Chip label="بدون نام" />} |{' '}
+                            {user.email || <Chip label="بدون ایمیل" />} |{' '}
+                            {user.mobile || <Chip label="بدون موبایل" />}
+                          </MenuItem>
+                        ))}
+                      </Select>
+
+                      <Select
+                        input={<OutlinedInput label="انتخاب دسته بندی" />}
+                        labelId="category-label"
+                        id="demo-multiple-name"
+                        {...getFieldProps('categoryId')}
+                        error={Boolean(touched.categoryId && errors.categoryId)}
+                        helperText={touched.categoryId && errors.categoryId}
+                      >
+                        {categories.map((category) => (
+                          <MenuItem
+                            key={category.id}
+                            value={category.id}
+                            style={getStyles(category.id, values.categoryId, theme)}
+                          >
+                            {category.title}
                           </MenuItem>
                         ))}
                       </Select>
