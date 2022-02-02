@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
 import { Icon } from '@iconify/react';
+import React, { useEffect } from 'react';
 // import { sentenceCase } from 'change-case';
 import plusFill from '@iconify/icons-eva/plus-fill';
 import { Link as RouterLink } from 'react-router-dom';
@@ -17,9 +17,13 @@ import {
   Typography,
   TableContainer,
   TablePagination,
-  Avatar
+  Avatar,
+  MenuItem,
+  ListItemIcon,
+  ListItemText
 } from '@mui/material';
 import toast from 'react-hot-toast';
+import listFill from '@iconify/icons-eva/list-fill';
 // components
 import Page from '../components/Page';
 import Scrollbar from '../components/Scrollbar';
@@ -29,6 +33,7 @@ import { getDeliveriesApi, deleteDeliveryApi } from '../apis/Delivery';
 
 import { useTableData } from '../hooks/useTableData';
 import YesNoModal from '../components/_dashboard/app/YesNoModal';
+
 //
 // import USERLIST from '../_mocks_/user';
 
@@ -192,7 +197,21 @@ export default function Delivery() {
                             <MoreMenu
                               editLink={`/dashboard/delivery/${id}`}
                               handleDelete={() => handleDeleteModalVisible(true, id)}
-                            />
+                            >
+                              <MenuItem
+                                component={RouterLink}
+                                to={`/dashboard/delivery/${id}/address`}
+                                sx={{ color: 'text.secondary' }}
+                              >
+                                <ListItemIcon>
+                                  <Icon icon={listFill} width={24} height={24} />
+                                </ListItemIcon>
+                                <ListItemText
+                                  primary="آدرس فروشگاه"
+                                  primaryTypographyProps={{ variant: 'body2' }}
+                                />
+                              </MenuItem>
+                            </MoreMenu>
                           </TableCell>
                         </TableRow>
                       );

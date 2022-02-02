@@ -13,7 +13,7 @@ MoreMenu.propTypes = {
   editLink: PropTypes.string.isRequired,
   handleDelete: PropTypes.func.isRequired
 };
-export default function MoreMenu({ editLink, handleDelete }) {
+export default function MoreMenu({ editLink, handleDelete, children }) {
   const ref = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -37,15 +37,16 @@ export default function MoreMenu({ editLink, handleDelete }) {
           <ListItemIcon>
             <Icon icon={trash2Outline} width={24} height={24} />
           </ListItemIcon>
-          <ListItemText primary="Delete" primaryTypographyProps={{ variant: 'body2' }} />
+          <ListItemText primary="حذف" primaryTypographyProps={{ variant: 'body2' }} />
         </MenuItem>
 
         <MenuItem component={RouterLink} to={editLink} sx={{ color: 'text.secondary' }}>
           <ListItemIcon>
             <Icon icon={editFill} width={24} height={24} />
           </ListItemIcon>
-          <ListItemText primary="Edit" primaryTypographyProps={{ variant: 'body2' }} />
+          <ListItemText primary="ویرایش" primaryTypographyProps={{ variant: 'body2' }} />
         </MenuItem>
+        {children}
       </Menu>
     </>
   );

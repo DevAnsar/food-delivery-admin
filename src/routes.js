@@ -12,6 +12,7 @@ import Delivery from './pages/Delivery';
 import NotFound from './pages/Page404';
 // componenrts
 import DeliveryForm from './components/_dashboard/delivery/DeliveryForm';
+import DeliveryAddressForm from './components/_dashboard/delivery/DeliveryAddressForm';
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -26,6 +27,7 @@ export default function Router() {
         { path: 'delivery', element: <Delivery /> },
         { path: 'delivery/:id', element: <DeliveryForm mode="edit" /> },
         { path: 'delivery/create', element: <DeliveryForm mode="create" /> },
+        { path: 'delivery/:id/address', element: <DeliveryAddressForm /> },
         { path: 'products', element: <Products /> },
         { path: 'blog', element: <Blog /> }
       ]
